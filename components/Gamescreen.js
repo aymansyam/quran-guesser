@@ -1,12 +1,20 @@
 import React, { useState } from "react";
 import WheelPickerExpo from "react-native-wheel-picker-expo";
 import { StatusBar } from "expo-status-bar";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Button,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import quran from "../assets/quran.json";
 
 // array with all surah names
 const surahNames = quran.map((surah) => surah.name + " " + surah.number);
-const TIMER_VALUE = 60;
+const TIMER_VALUE = 25;
 
 function Gamescreen({ route, navigation }) {
   const difficulty = route.params.level;
@@ -44,16 +52,17 @@ function Gamescreen({ route, navigation }) {
   React.useEffect(() => {
     if (timer <= 0) {
       setAyah(getRandomAyah());
-      setTimer(TIMER_VALUE / difficulty);
+      setTimer(TIMER_VALUE * difficulty);
     }
   }, [timer]);
 
   function generateRandomAyahAndSurah() {
     // generate random surah number between 100 and 114
-    let surahNumber_tmp = 0;
-    if (difficulty === 1) {
-      surahNumber_tmp = Math.floor(Math.floor(Math.random() * 14) + 100);
-    } else if (difficulty === 2) {
+    let surahNumber_tmp = 1;
+    if (difficulty == 3) {
+      // surahNumber_tmp = Math.floor(Math.floor(Math.random() * 14) + 100);
+      surahNumber_tmp = 1;
+    } else if (difficulty == 2) {
       // generate random surah number between 50 and 114
       surahNumber_tmp = Math.floor(Math.floor(Math.random() * 64) + 50);
     } else {
@@ -61,7 +70,8 @@ function Gamescreen({ route, navigation }) {
       surahNumber_tmp = Math.floor(Math.floor(Math.random() * 114) + 0);
     }
     const surah = quran[surahNumber_tmp];
-    const ayahNumber_tmp = Math.floor(Math.random() * surah.ayahs.length);
+    // const ayahNumber_tmp = Math.floor(Math.random() * surah.ayahs.length);
+    const ayahNumber_tmp = 282;
     setSurahNumber(surahNumber_tmp);
     setAyahNumber(ayahNumber_tmp);
 
@@ -74,49 +84,23 @@ function Gamescreen({ route, navigation }) {
     const surah = quran[surahNum];
     const ayah = surah.ayahs[ayahNum];
     setSurahText(() => {
-      if (difficulty === 1) {
-        // get the previous and next 3 ayahs
-        let ayahs = [];
-        for (let i = ayahNum - 3; i <= ayahNum + 3; i++) {
-          if (i >= 0 && i < surah.ayahs.length) {
-            // if the ayah is the selected ayah, then add a paranthesis around it
-            if (i === ayahNum) {
-              ayahs.push("(" + surah.ayahs[i].text + ")");
-            } else {
-              ayahs.push(surah.ayahs[i].text);
-            }
+      console.log(surah.name);
+      // get the previous and next 3 ayahs
+      let ayahs = [];
+      for (let i = ayahNum - difficulty; i <= ayahNum + difficulty; i++) {
+        if (i >= 0 && i < surah.ayahs.length) {
+          // if the ayah is the selected ayah, then add a --> in the beginning
+          if (i == ayahNum) {
+            ayahs.push("-->" + surah.ayahs[i].text);
+          } else {
+            ayahs.push(surah.ayahs[i].text);
           }
         }
-        return ayahs.join(" ");
-      } else if (difficulty === 2) {
-        // get the previous and next 2 ayahs
-        let ayahs = [];
-        for (let i = ayahNum - 2; i <= ayahNum + 2; i++) {
-          if (i >= 0 && i < surah.ayahs.length) {
-            // if the ayah is the selected ayah, then add a paranthesis around it
-            if (i === ayahNum) {
-              ayahs.push("(" + surah.ayahs[i].text + ")");
-            } else {
-              ayahs.push(surah.ayahs[i].text);
-            }
-          }
-        }
-        return ayahs.join(" ");
-      } else {
-        // get the previous and next ayah
-        let ayahs = [];
-        for (let i = ayahNum - 1; i <= ayahNum + 1; i++) {
-          if (i >= 0 && i < surah.ayahs.length) {
-            // if the ayah is the selected ayah, then add a paranthesis around it
-            if (i === ayahNum) {
-              ayahs.push("(" + surah.ayahs[i].text + ")");
-            } else {
-              ayahs.push(surah.ayahs[i].text);
-            }
-          }
-        }
-        return ayahs.join(" ");
       }
+      console.log(ayahs.join(" "));
+      let overFlowText = false;
+
+      return ayahs.join(" ");
     });
   }
 
@@ -130,11 +114,11 @@ function Gamescreen({ route, navigation }) {
 
   function nextRound() {
     setAyah(getRandomAyah());
-    setTimer(TIMER_VALUE / difficulty);
+    setTimer(TIMER_VALUE * difficulty);
   }
 
   function calculateScore(surahGuess, ayahGuess, surahActual, ayahActual) {
-    calculated_score = 0;
+    let calculated_score = 0;
     // perfect score
     if (surahGuess == surahActual && ayahGuess == ayahActual) {
       calculated_score += 5000;
@@ -206,23 +190,28 @@ function Gamescreen({ route, navigation }) {
     <View style={styles.container}>
       <Text style={styles.text}>{surahText}</Text>
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-        <WheelPickerExpo
-          height={300}
-          width={200}
-          initialSelectedIndex={100}
-          items={surahNames.map((name) => ({ label: name, value: "" }))}
-          onChange={({ item }) => setSurahInput(item.label)}
-        />
-
-        <WheelPickerExpo
-          height={300}
-          width={100}
-          initialSelectedIndex={0}
-          items={getAyahs(surahInput)
-            .map((ayah) => ayah.numberInSurah)
-            .map((name) => ({ label: name, value: "" }))}
-          onChange={({ item }) => setAyahInput(item.label)}
-        />
+        <View style={{ flexDirection: "column" }}>
+          <WheelPickerExpo
+            height={300}
+            width={200}
+            initialSelectedIndex={100}
+            items={surahNames.map((name) => ({ label: name, value: "" }))}
+            onChange={({ item }) => setSurahInput(item.label)}
+          />
+          <Text style={styles.surahScrollerText}>Surah</Text>
+        </View>
+        <View style={{ flexDirection: "column" }}>
+          <WheelPickerExpo
+            height={300}
+            width={100}
+            initialSelectedIndex={0}
+            items={getAyahs(surahInput)
+              .map((ayah) => ayah.numberInSurah)
+              .map((name) => ({ label: name, value: "" }))}
+            onChange={({ item }) => setAyahInput(item.label)}
+          />
+          <Text style={styles.ayahScrollerText}>Ayah</Text>
+        </View>
       </View>
       <Button
         style={styles.button}
@@ -290,6 +279,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginTop: 20,
+  },
+  surahScrollerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginLeft: 50,
+  },
+  ayahScrollerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginLeft: 30,
   },
 });
 

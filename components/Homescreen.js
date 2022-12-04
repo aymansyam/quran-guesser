@@ -5,9 +5,9 @@ import { useNavigation } from "@react-navigation/native";
 import WheelPickerExpo from 'react-native-wheel-picker-expo';
 
 difficulties = [
-    { label: "Easy", value: 1 },
+    { label: "Easy", value: 3 },
     { label: "Medium", value: 2 },
-    { label: "Hard", value: 3 }
+    { label: "Hard", value: 1 }
 ]
 function Homescreen() {
   const navigation = useNavigation();
