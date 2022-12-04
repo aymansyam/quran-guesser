@@ -11,13 +11,51 @@ import {
   View,
 } from "react-native";
 import quran from "../assets/quran.json";
+import { Overlay } from "react-native-elements";
 
 // array with all surah names
 const surahNames = quran.map((surah) => surah.name + " " + surah.number);
 const TIMER_VALUE = 25;
 
 function Gamescreen({ route, navigation }) {
+  // react hook for overlay visibility
+  const [visible, setVisible] = useState(false);
+  const toggleOverlay = () => {
+    console.log("toggleOverlay: " + visible);
+    if (visible) {
+      const surahCheckNum = surahInput.match(/\d+/)[0];
+      console.log(surahCheckNum, ayahInput);
+      setScore(
+        score +
+          calculateScore(
+            surahCheckNum,
+            ayahInput,
+            surahNumber + 1,
+            ayahNumber + 1
+          )
+      );
+      nextRound();
+    }
+    setVisible(!visible);
+  
+  };
+
+  // react hook for game over overlay visibility
+  const [gameOverVisible, setGameOverVisible] = useState(false);
+  const toggleGameOverOverlay = () => {
+    setGameOverVisible(!gameOverVisible);
+    if (gameOverVisible) {
+      setRound(0);
+      navigation.navigate("Home");
+    }
+  };
+
   const difficulty = route.params.level;
+  const [justCreated, setJustCreated] = useState(true);
+
+  // react hook to store round number
+  const [round, setRound] = useState(0);
+
   // react hook to store the state of the ayah
   const [ayah, setAyah] = useState("");
   // react hook to store the state of the user input
@@ -36,10 +74,26 @@ function Gamescreen({ route, navigation }) {
   const [surahNumber, setSurahNumber] = useState(0);
 
   // react hook to decrement the timer to 0 and then reset it
-  const [timer, setTimer] = React.useState(0);
+  const [timer, setTimer] = React.useState(TIMER_VALUE * difficulty);
 
   // react hook to store the score
   const [score, setScore] = React.useState(0);
+
+
+  // react hook to detect game over
+  React.useEffect(() => {
+    if (round > 5) {
+      toggleGameOverOverlay();
+    }
+  }, [round]);
+
+  // react hook to start round 
+  React.useEffect(() => {
+    if (justCreated) {
+      setJustCreated(false);
+      nextRound();
+    }
+  }, [justCreated]);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -51,8 +105,10 @@ function Gamescreen({ route, navigation }) {
   // react hook to reset the timer and ayah when the timer reaches 0
   React.useEffect(() => {
     if (timer <= 0) {
-      setAyah(getRandomAyah());
-      setTimer(TIMER_VALUE * difficulty);
+      setTimer(0);
+      if (!visible) {
+        toggleOverlay();
+      }
     }
   }, [timer]);
 
@@ -104,8 +160,8 @@ function Gamescreen({ route, navigation }) {
       overFlow = true;
       // find substring "-->" and truncate the string around it
       let index = result.indexOf("-->");
-      let start = index - (character_limit / 2);
-      let end = index + (character_limit / 2);
+      let start = index - character_limit / 2;
+      let end = index + character_limit / 2;
       if (start < 0) {
         start = 0;
       }
@@ -132,6 +188,7 @@ function Gamescreen({ route, navigation }) {
   function nextRound() {
     setAyah(getRandomAyah());
     setTimer(TIMER_VALUE * difficulty);
+    setRound(round + 1);
   }
 
   function calculateScore(surahGuess, ayahGuess, surahActual, ayahActual) {
@@ -230,26 +287,29 @@ function Gamescreen({ route, navigation }) {
           <Text style={styles.ayahScrollerText}>Ayah</Text>
         </View>
       </View>
+      <Overlay isVisible={gameOverVisible} onBackdropPress={toggleGameOverOverlay}>
+        <Text>
+          Game Over! Your score is {score} 
+        </Text>
+        </Overlay>
+      <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
+        <Text>
+          +{calculateScore(surahInput.match(/\d+/)[0],ayahInput,surahNumber + 1,ayahNumber + 1)} points!
+        </Text>
+        <Text>
+          Answer was: ({quran[surahNumber].number}) Surah {quran[surahNumber].englishName} Verse {ayahNumber + 1}
+        </Text>
+      </Overlay>
       <Button
         style={styles.button}
         title="Check"
         onPress={() => {
-          const surahCheckNum = surahInput.match(/\d+/)[0];
-          console.log(surahCheckNum, ayahInput);
-          setScore(
-            score +
-              calculateScore(
-                surahCheckNum,
-                ayahInput,
-                surahNumber + 1,
-                ayahNumber + 1
-              )
-          );
-          nextRound();
+          toggleOverlay();
         }}
       />
 
       <Text style={styles.score}>Score: {score}</Text>
+      <Text style={styles.round}>Round: {round}</Text>
       <Text style={styles.timer}>{timer}</Text>
 
       <StatusBar style="auto" />
@@ -307,6 +367,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 30,
   },
+  round: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20,
+  },
+
 });
 
 export default Gamescreen;
