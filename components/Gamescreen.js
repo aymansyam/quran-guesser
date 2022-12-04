@@ -60,8 +60,7 @@ function Gamescreen({ route, navigation }) {
     // generate random surah number between 100 and 114
     let surahNumber_tmp = 1;
     if (difficulty == 3) {
-      // surahNumber_tmp = Math.floor(Math.floor(Math.random() * 14) + 100);
-      surahNumber_tmp = 1;
+      surahNumber_tmp = Math.floor(Math.floor(Math.random() * 14) + 100);
     } else if (difficulty == 2) {
       // generate random surah number between 50 and 114
       surahNumber_tmp = Math.floor(Math.floor(Math.random() * 64) + 50);
@@ -70,8 +69,7 @@ function Gamescreen({ route, navigation }) {
       surahNumber_tmp = Math.floor(Math.floor(Math.random() * 114) + 0);
     }
     const surah = quran[surahNumber_tmp];
-    // const ayahNumber_tmp = Math.floor(Math.random() * surah.ayahs.length);
-    const ayahNumber_tmp = 282;
+    const ayahNumber_tmp = Math.floor(Math.random() * surah.ayahs.length);
     setSurahNumber(surahNumber_tmp);
     setAyahNumber(ayahNumber_tmp);
 
@@ -82,26 +80,45 @@ function Gamescreen({ route, navigation }) {
   function getRandomAyah() {
     [surahNum, ayahNum] = generateRandomAyahAndSurah();
     const surah = quran[surahNum];
-    const ayah = surah.ayahs[ayahNum];
-    setSurahText(() => {
-      console.log(surah.name);
-      // get the previous and next 3 ayahs
-      let ayahs = [];
-      for (let i = ayahNum - difficulty; i <= ayahNum + difficulty; i++) {
-        if (i >= 0 && i < surah.ayahs.length) {
-          // if the ayah is the selected ayah, then add a --> in the beginning
-          if (i == ayahNum) {
-            ayahs.push("-->" + surah.ayahs[i].text);
-          } else {
-            ayahs.push(surah.ayahs[i].text);
-          }
+    // get the previous and next 3 ayahs
+    let ayahs = [];
+    for (let i = ayahNum - difficulty; i <= ayahNum + difficulty; i++) {
+      if (i >= 0 && i < surah.ayahs.length) {
+        // if the ayah is the selected ayah, then add a --> in the beginning
+        if (i == ayahNum) {
+          ayahs.push("-->" + surah.ayahs[i].text);
+        } else {
+          ayahs.push(surah.ayahs[i].text);
         }
       }
-      console.log(ayahs.join(" "));
-      let overFlowText = false;
+    }
+    let final_text = truncateSurahText(ayahs);
+    setSurahText(final_text);
+  }
 
-      return ayahs.join(" ");
-    });
+  function truncateSurahText(ayahs) {
+    let overFlow = false;
+    let result = ayahs.join(" ");
+    let character_limit = 500;
+    if (result.length > character_limit) {
+      overFlow = true;
+      // find substring "-->" and truncate the string around it
+      let index = result.indexOf("-->");
+      let start = index - (character_limit / 2);
+      let end = index + (character_limit / 2);
+      if (start < 0) {
+        start = 0;
+      }
+      if (end > result.length) {
+        end = result.length;
+      }
+      result = result.substring(start, end);
+    }
+    if (overFlow) {
+      result = "..." + result + "...";
+    }
+
+    return result;
   }
 
   // function to get the ayahs when the user selects a surah

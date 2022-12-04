@@ -12,16 +12,19 @@ difficulties = [
 function Homescreen() {
   const navigation = useNavigation();
   // react hook to store difficulty level
-    const [difficulty, setDifficulty] = useState(1);
+    const [difficulty, setDifficulty] = useState(3); // default to easy
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Quran Memorization Game</Text>
+      <Text style={styles.subtitle}>Select Difficulty</Text>
       <WheelPickerExpo
           height={300}
           width={200}
-          initialSelectedIndex={0}
+          initialSelectedIndex={0} // default to easy
           items={difficulties}
           onChange={({ item }) => setDifficulty(item.value)}
         />
+      
       <Button
         title="Play"
         onPress={() => navigation.navigate("Game", { level: difficulty })}
@@ -30,6 +33,7 @@ function Homescreen() {
           marginTop: 100,
         }}
       />
+
     </View>
   );
 }
@@ -40,6 +44,14 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'top',
       
+    },
+    title: {
+      fontSize: 30,
+      marginTop: 100,
+    },
+    subtitle: {
+      fontSize: 20,
+      marginTop: 50,
     },
 });
 export default Homescreen;
