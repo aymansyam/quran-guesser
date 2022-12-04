@@ -15,6 +15,18 @@ function Homescreen() {
     const [difficulty, setDifficulty] = useState(3); // default to easy
   return (
     <View style={styles.container}>
+      <View style={styles.titleContainer}>
+      <Button
+        title="Rules"
+        onPress={() => navigation.navigate("Rules")}
+      />
+      <Button
+
+        title="Points System"
+        onPress={() => navigation.navigate("Points")}
+      />
+        </View>
+
       <Text style={styles.title}>Quran Memorization Game</Text>
       <Text style={styles.subtitle}>Select Difficulty</Text>
       <WheelPickerExpo
@@ -26,7 +38,7 @@ function Homescreen() {
         />
       
       <Button
-        title="Play"
+        title="Start Game"
         onPress={() => navigation.navigate("Game", { level: difficulty })}
         style={{
           // add space between button and text
@@ -52,6 +64,13 @@ const styles = StyleSheet.create({
     subtitle: {
       fontSize: 20,
       marginTop: 50,
+    },
+    titleContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+      padding: 20,
+      paddingTop: 50,
     },
 });
 export default Homescreen;

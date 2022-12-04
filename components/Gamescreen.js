@@ -82,7 +82,7 @@ function Gamescreen({ route, navigation }) {
 
   // react hook to detect game over
   React.useEffect(() => {
-    if (round > 5) {
+    if (round > 10) {
       toggleGameOverOverlay();
     }
   }, [round]);
@@ -257,7 +257,7 @@ function Gamescreen({ route, navigation }) {
         }
       }
     }
-    return calculated_score;
+    return Math.floor(calculated_score * (1 / difficulty));
   }
 
   return (
