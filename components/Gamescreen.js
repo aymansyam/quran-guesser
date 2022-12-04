@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import WheelPickerExpo from 'react-native-wheel-picker-expo';
-import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import quran from '../assets/quran.json';
+import React, { useState } from "react";
+import WheelPickerExpo from "react-native-wheel-picker-expo";
+import { StatusBar } from "expo-status-bar";
+import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import quran from "../assets/quran.json";
 
 // array with all surah names
-const surahNames = quran.map((surah) => surah.name + ' ' + surah.number);
+const surahNames = quran.map((surah) => surah.name + " " + surah.number);
 const TIMER_VALUE = 60;
 
-function Gamescreen() {
+function Gamescreen({ route, navigation }) {
+  const difficulty = route.params.level;
   // react hook to store the state of the ayah
   const [ayah, setAyah] = useState("");
   // react hook to store the state of the user input
@@ -43,12 +44,22 @@ function Gamescreen() {
   React.useEffect(() => {
     if (timer <= 0) {
       setAyah(getRandomAyah());
-      setTimer(TIMER_VALUE);
+      setTimer(TIMER_VALUE / difficulty);
     }
   }, [timer]);
 
   function generateRandomAyahAndSurah() {
-    const surahNumber_tmp = Math.floor(Math.random() * quran.length);
+    // generate random surah number between 100 and 114
+    let surahNumber_tmp = 0;
+    if (difficulty === 1) {
+      surahNumber_tmp = Math.floor(Math.floor(Math.random() * 14) + 100);
+    } else if (difficulty === 2) {
+      // generate random surah number between 50 and 114
+      surahNumber_tmp = Math.floor(Math.floor(Math.random() * 64) + 50);
+    } else {
+      // generate random surah number between 1 and 114
+      surahNumber_tmp = Math.floor(Math.floor(Math.random() * 114) + 0);
+    }
     const surah = quran[surahNumber_tmp];
     const ayahNumber_tmp = Math.floor(Math.random() * surah.ayahs.length);
     setSurahNumber(surahNumber_tmp);
@@ -62,7 +73,51 @@ function Gamescreen() {
     [surahNum, ayahNum] = generateRandomAyahAndSurah();
     const surah = quran[surahNum];
     const ayah = surah.ayahs[ayahNum];
-    setSurahText(ayah["text"]);
+    setSurahText(() => {
+      if (difficulty === 1) {
+        // get the previous and next 3 ayahs
+        let ayahs = [];
+        for (let i = ayahNum - 3; i <= ayahNum + 3; i++) {
+          if (i >= 0 && i < surah.ayahs.length) {
+            // if the ayah is the selected ayah, then add a paranthesis around it
+            if (i === ayahNum) {
+              ayahs.push("(" + surah.ayahs[i].text + ")");
+            } else {
+              ayahs.push(surah.ayahs[i].text);
+            }
+          }
+        }
+        return ayahs.join(" ");
+      } else if (difficulty === 2) {
+        // get the previous and next 2 ayahs
+        let ayahs = [];
+        for (let i = ayahNum - 2; i <= ayahNum + 2; i++) {
+          if (i >= 0 && i < surah.ayahs.length) {
+            // if the ayah is the selected ayah, then add a paranthesis around it
+            if (i === ayahNum) {
+              ayahs.push("(" + surah.ayahs[i].text + ")");
+            } else {
+              ayahs.push(surah.ayahs[i].text);
+            }
+          }
+        }
+        return ayahs.join(" ");
+      } else {
+        // get the previous and next ayah
+        let ayahs = [];
+        for (let i = ayahNum - 1; i <= ayahNum + 1; i++) {
+          if (i >= 0 && i < surah.ayahs.length) {
+            // if the ayah is the selected ayah, then add a paranthesis around it
+            if (i === ayahNum) {
+              ayahs.push("(" + surah.ayahs[i].text + ")");
+            } else {
+              ayahs.push(surah.ayahs[i].text);
+            }
+          }
+        }
+        return ayahs.join(" ");
+      }
+    });
   }
 
   // function to get the ayahs when the user selects a surah
@@ -75,7 +130,7 @@ function Gamescreen() {
 
   function nextRound() {
     setAyah(getRandomAyah());
-    setTimer(TIMER_VALUE);
+    setTimer(TIMER_VALUE / difficulty);
   }
 
   function calculateScore(surahGuess, ayahGuess, surahActual, ayahActual) {
@@ -196,19 +251,16 @@ function Gamescreen() {
   );
 }
 
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'top',
-    
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "top",
   },
   text: {
     fontSize: 20,
-    fontWeight: 'bold', 
+    fontWeight: "bold",
     marginTop: 20,
   },
   input: {
@@ -227,20 +279,18 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   score: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 20,
   },
   timer: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 20,
-  }
-
+  },
 });
-
 
 export default Gamescreen;

@@ -4,7 +4,11 @@ import { Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import WheelPickerExpo from 'react-native-wheel-picker-expo';
 
-
+difficulties = [
+    { label: "Easy", value: 1 },
+    { label: "Medium", value: 2 },
+    { label: "Hard", value: 3 }
+]
 function Homescreen() {
   const navigation = useNavigation();
   // react hook to store difficulty level
@@ -15,8 +19,8 @@ function Homescreen() {
           height={300}
           width={200}
           initialSelectedIndex={0}
-          items={['Easy', 'Medium', 'Hard'].map((name) => ({ label: name, value: "" }))}
-          onChange={({ item }) => setDifficulty(item.label)}
+          items={difficulties}
+          onChange={({ item }) => setDifficulty(item.value)}
         />
       <Button
         title="Play"
