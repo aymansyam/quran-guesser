@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import WheelPickerExpo from "react-native-wheel-picker-expo";
 import { StatusBar } from "expo-status-bar";
+import { Linking } from "react-native";
 import {
   Button,
   FlatList,
@@ -283,18 +284,36 @@ function Gamescreen({ route, navigation }) {
         </Text>
         </Overlay>
       <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
-        <Text>
+        <Text style={{paddingLeft: 100 }}>
           +{calculateScore(surahInput,ayahInput,surahNumber + 1,ayahNumber + 1)} points!
         </Text>
-        <Text>
+        <Text style={ {paddingTop:10, fontSize:15} }>
           Answer was: ({quran[surahNumber].number}) Surah {quran[surahNumber].englishName} Verse {ayahNumber + 1}
         </Text>
+        <Text style={ {paddingTop:10, fontSize:15} } >
+          Your guess was: ({surahInput}) Surah {quran[surahInput - 1].englishName} Verse {ayahInput}
+        </Text>
+        <Text
+          style={{ color: "blue", paddingTop: 20 }}
+          onPress={() => {
+            Linking.openURL(
+              "https://quran.com/" +
+                quran[surahNumber].number +
+                "/" +
+                (ayahNumber + 1)
+            );
+          }}
+        >
+          View on Quran.com
+        </Text>
+
       </Overlay>
       <Button
         style={styles.button}
         title="Check"
         onPress={() => {
           toggleOverlay();
+          setAyahInput(1);
         }}
       />
 
