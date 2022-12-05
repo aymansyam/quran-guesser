@@ -15,6 +15,13 @@ function Rules() {
         3. The difficulty level determines the multiplier of points you earn for
         each correct guess.
       </Text>
+      <Text>
+        4. A perfect score is 5000 points {"("}exact guess on hard difficulty
+        {")"}
+      </Text>
+      <Text>
+        5. Points decrease the further away you are from the correct ayah
+      </Text>
     </View>
   );
 }
