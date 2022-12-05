@@ -66,7 +66,7 @@ function Gamescreen({ route, navigation }) {
   const [surahText, setSurahText] = useState("");
 
   // react hook to store the state of the user input
-  const [ayahInput, setAyahInput] = useState(0);
+  const [ayahInput, setAyahInput] = useState(1);
 
   // react hook to store the generated ayah number
   const [ayahNumber, setAyahNumber] = useState(0);
