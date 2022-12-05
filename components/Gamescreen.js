@@ -258,7 +258,11 @@ function Gamescreen({ route, navigation }) {
       <Text style={styles.text}>{surahText}</Text>
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
         <View style={{ flexDirection: "column" }}>
-          <Picker style={styles.picker} selectedValue={surahInput} onValueChange={(itemValue, itemIndex) => setSurahInput(itemValue)}>
+          <Picker style={styles.picker} selectedValue={surahInput} onValueChange={(itemValue, itemIndex) => 
+            {
+              setSurahInput(itemValue);
+              setAyahInput(1);
+              }}>
             {quran.map((surah, index) => (
               // picker item with value surah name and number
               <Picker.Item key={index} label={surah.name + " " + surah.number} value={surah.number} />
@@ -313,7 +317,6 @@ function Gamescreen({ route, navigation }) {
         title="Check"
         onPress={() => {
           toggleOverlay();
-          setAyahInput(1);
         }}
       />
 
