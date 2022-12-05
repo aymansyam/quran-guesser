@@ -190,7 +190,7 @@ function Gamescreen({ route, navigation }) {
       let actualIndex = quran[surahActual - 1].ayahs[ayahActual - 1].number;
       let guessIndex = quran[surahGuess - 1].ayahs[ayahGuess - 1].number;
       let diff = Math.abs(actualIndex - guessIndex);
-      // calculate score using the formula 100 - 10 * diff where diff is the difference between the actual and guessed ayah number 
+      
       let calculated_score = 5000 - 5000 * ((diff * diff) / 6236);
       if (calculated_score < 0) {
         calculated_score = 0;
