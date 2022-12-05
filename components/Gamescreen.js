@@ -185,72 +185,20 @@ function Gamescreen({ route, navigation }) {
   }
 
   function calculateScore(surahGuess, ayahGuess, surahActual, ayahActual) {
-    let calculated_score = 0;
-    // perfect score
-    if (surahGuess == surahActual && ayahGuess == ayahActual) {
-      calculated_score += 5000;
-    } else {
-      // surah is correct
-      if (surahGuess == surahActual) {
-        calculated_score += 2500;
-        // check if the ayah is within 5 ayahs of the actual ayah
-        if (ayahGuess >= ayahActual - 5 && ayahGuess <= ayahActual + 5) {
-          calculated_score += 1250;
-        }
-        // check if the ayah is within 10 ayahs of the actual ayah
-        else if (ayahGuess >= ayahActual - 10 && ayahGuess <= ayahActual + 10) {
-          calculated_score += 625;
-        }
-        // check if the ayah is within 15 ayahs of the actual ayah
-        else if (ayahGuess >= ayahActual - 15 && ayahGuess <= ayahActual + 15) {
-          calculated_score += 312;
-        }
-        // check if the ayah is within 20 ayahs of the actual ayah
-        else if (ayahGuess >= ayahActual - 20 && ayahGuess <= ayahActual + 20) {
-          calculated_score += 156;
-        }
-        // check if the ayah is within 25 ayahs of the actual ayah
-        else if (ayahGuess >= ayahActual - 25 && ayahGuess <= ayahActual + 25) {
-          calculated_score += 78;
-        }
+    try 
+    {
+      let actualIndex = quran[surahActual - 1].ayahs[ayahActual - 1].number;
+      let guessIndex = quran[surahGuess - 1].ayahs[ayahGuess - 1].number;
+      let diff = Math.abs(actualIndex - guessIndex);
+      // calculate score using the formula 100 - 10 * diff where diff is the difference between the actual and guessed ayah number 
+      let calculated_score = 5000 - 5000 * ((diff * diff) / 6236);
+      if (calculated_score < 0) {
+        calculated_score = 0;
       }
-      // surah is incorrect
-      else {
-        // check if the surah is within 1 surahs of the actual surah
-        if (surahGuess >= surahActual - 1 && surahGuess <= surahActual + 1) {
-          calculated_score += 39;
-        }
-        // check if the surah is within 2 surahs of the actual surah
-        else if (
-          surahGuess >= surahActual - 2 &&
-          surahGuess <= surahActual + 2
-        ) {
-          calculated_score += 19;
-        }
-        // check if the surah is within 3 surahs of the actual surah
-        else if (
-          surahGuess >= surahActual - 3 &&
-          surahGuess <= surahActual + 3
-        ) {
-          calculated_score += 9;
-        }
-        // check if the surah is within 4 surahs of the actual surah
-        else if (
-          surahGuess >= surahActual - 4 &&
-          surahGuess <= surahActual + 4
-        ) {
-          calculated_score += 4;
-        }
-        // check if the surah is within 5 surahs of the actual surah
-        else if (
-          surahGuess >= surahActual - 5 &&
-          surahGuess <= surahActual + 5
-        ) {
-          calculated_score += 2;
-        }
-      }
+      return Math.floor(calculated_score * (1 / difficulty));
+    } catch (e) {
+      return 0;
     }
-    return Math.floor(calculated_score * (1 / difficulty));
   }
 
   return (
