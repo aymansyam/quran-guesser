@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import WheelPickerExpo from 'react-native-wheel-picker-expo';
+import { Picker } from "@react-native-picker/picker";
 
 difficulties = [
     { label: "Easy", value: 3 },
@@ -29,13 +30,14 @@ function Homescreen() {
 
       <Text style={styles.title}>Quran Memorization Game</Text>
       <Text style={styles.subtitle}>Select Difficulty</Text>
-      <WheelPickerExpo
-          height={300}
-          width={200}
-          initialSelectedIndex={0} // default to easy
-          items={difficulties}
-          onChange={({ item }) => setDifficulty(item.value)}
-        />
+      <Picker style={styles.picker}
+        selectedValue={difficulty}
+        onValueChange={(itemValue, itemIndex) => setDifficulty(itemValue)}
+      >
+        {difficulties.map((item, index) => {
+          return (<Picker.Item label={item.label} value={item.value} key={index} />);
+        })}
+      </Picker>
       
       <Button
         title="Start Game"
@@ -72,5 +74,11 @@ const styles = StyleSheet.create({
       padding: 20,
       paddingTop: 50,
     },
+    picker: {
+      width: 200,
+      height: 50,
+      marginBottom: 150,
+    }
+
 });
 export default Homescreen;

@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import quran from "../assets/quran.json";
 import { Overlay } from "react-native-elements";
 
@@ -23,12 +24,11 @@ function Gamescreen({ route, navigation }) {
   const toggleOverlay = () => {
     console.log("toggleOverlay: " + visible);
     if (visible) {
-      const surahCheckNum = surahInput.match(/\d+/)[0];
-      console.log(surahCheckNum, ayahInput);
+      console.log(surahInput, ayahInput);
       setScore(
         score +
           calculateScore(
-            surahCheckNum,
+            surahInput,
             ayahInput,
             surahNumber + 1,
             ayahNumber + 1
@@ -59,7 +59,7 @@ function Gamescreen({ route, navigation }) {
   // react hook to store the state of the ayah
   const [ayah, setAyah] = useState("");
   // react hook to store the state of the user input
-  const [surahInput, setSurahInput] = useState("NA 1");
+  const [surahInput, setSurahInput] = useState(1);
 
   // react hook to store surah text
   const [surahText, setSurahText] = useState("");
@@ -177,14 +177,6 @@ function Gamescreen({ route, navigation }) {
     return result;
   }
 
-  // function to get the ayahs when the user selects a surah
-  function getAyahs() {
-    // get the surah number from the user input regex match
-    const surahNumber = surahInput.match(/\d+/)[0];
-    const surah = quran[surahNumber - 1];
-    return surah.ayahs;
-  }
-
   function nextRound() {
     setAyah(getRandomAyah());
     setTimer(TIMER_VALUE * difficulty);
@@ -265,25 +257,23 @@ function Gamescreen({ route, navigation }) {
       <Text style={styles.text}>{surahText}</Text>
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
         <View style={{ flexDirection: "column" }}>
-          <WheelPickerExpo
-            height={300}
-            width={200}
-            initialSelectedIndex={100}
-            items={surahNames.map((name) => ({ label: name, value: "" }))}
-            onChange={({ item }) => setSurahInput(item.label)}
-          />
+          <Picker style={styles.picker} selectedValue={surahInput} onValueChange={(itemValue, itemIndex) => setSurahInput(itemValue)}>
+            {quran.map((surah, index) => (
+              // picker item with value surah name and number
+              <Picker.Item key={index} label={surah.name + " " + surah.number} value={surah.number} />
+              // combine string with number
+
+            ))}
+          </Picker>
           <Text style={styles.surahScrollerText}>Surah</Text>
         </View>
         <View style={{ flexDirection: "column" }}>
-          <WheelPickerExpo
-            height={300}
-            width={100}
-            initialSelectedIndex={0}
-            items={getAyahs(surahInput)
-              .map((ayah) => ayah.numberInSurah)
-              .map((name) => ({ label: name, value: "" }))}
-            onChange={({ item }) => setAyahInput(item.label)}
-          />
+          <Picker style={styles.ayahPicker} selectedValue={ayahInput} onValueChange={(itemValue, itemIndex) => setAyahInput(itemValue)}>
+
+            {quran[surahInput - 1].ayahs.map((ayah, index) => (
+              <Picker.Item key={index} label={ayah.numberInSurah.toString()} value={ayah.numberInSurah} /> 
+            ))}
+              </Picker>
           <Text style={styles.ayahScrollerText}>Ayah</Text>
         </View>
       </View>
@@ -294,7 +284,7 @@ function Gamescreen({ route, navigation }) {
         </Overlay>
       <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
         <Text>
-          +{calculateScore(surahInput.match(/\d+/)[0],ayahInput,surahNumber + 1,ayahNumber + 1)} points!
+          +{calculateScore(surahInput,ayahInput,surahNumber + 1,ayahNumber + 1)} points!
         </Text>
         <Text>
           Answer was: ({quran[surahNumber].number}) Surah {quran[surahNumber].englishName} Verse {ayahNumber + 1}
@@ -371,6 +361,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginTop: 20,
+  },
+  picker: {
+    height: 50,
+    width: 250,
+    marginTop: 20,
+    marginBottom: 170,
+  },
+  ayahPicker: {
+    height: 50,
+    width: 150,
+    marginTop: 20,
+    marginBottom: 170,
   },
 
 });
